@@ -1,3 +1,26 @@
+Table of Contents
+=================
+
+   * [getting-started-with-docker](#getting-started-with-docker)
+      * [Installing Docker in Ubuntu](#installing-docker-in-ubuntu)
+      * [Post installation setup a docker group and add the user to the group](#post-installation-setup-a-docker-group-and-add-the-user-to-the-group)
+      * [Verifying the installation](#verifying-the-installation)
+      * [Images](#images)
+         * [Download and installing images](#download-and-installing-images)
+         * [Deleting images](#deleting-images)
+      * [Containers](#containers)
+         * [Stopping and deleting containers](#stopping-and-deleting-containers)
+      * [Images repository](#images-repository)
+      * [Dockers and swarms](#dockers-and-swarms)
+         * [Terms and definitions](#terms-and-definitions)
+         * [Setting up a swarm](#setting-up-a-swarm)
+            * [To start a swarm####](#to-start-a-swarm)
+            * [To join a manager or worker to the swarm](#to-join-a-manager-or-worker-to-the-swarm)
+            * [Joining a manager or worker](#joining-a-manager-or-worker)
+            * [Viewing the node status](#viewing-the-node-status)
+            * [Can i change a worker to a manager- Yes](#can-i-change-a-worker-to-a-manager--yes)
+
+
 # getting-started-with-docker
 ## Installing Docker in Ubuntu
 - Follow the instructions here [link to Installation guide @ Docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
@@ -209,3 +232,92 @@ klsjdf0293jklflsjd0923llsd    < host name goes here>    Ready               Acti
 #### Can i change a worker to a manager- Yes ####
 Its possible to mistakingly use the wrong token. So to help smooth things, here is a command to convert a worker to a manager
 ``` docker node promote <the ID that looks like a GUID>```
+
+### Services ###
+We had a brief look at services in the terms and definitions section. Services are a declarative way of running and scaling tasks. We also took a brief look at spinning up a service with a given name. 
+Here are the list of possible servicecs related commands
+``` docker service <create|ls|ps|inspect|update|rm ```
+#### Creating a service ####
+``` docker service --name myWebApp -p servicePort:portOnNode --replicas 5 <image name> ```
+- This will cause 5 tasks / containers to be spun up in the swarm the current node belongs to.
+- Supposing there is only one node in the swarm (say in a developer laptop), the 5 replicas will be spun up in the same node. as shown below
+
+#### Viewing the replica status ####
+- `docker services ps <service name> `. 
+- For example if we start the service as follows.
+```
+ docker swarm init --advertise-addr 127.0.0.1:2377 --listen-addr 127.0.0.1:2377
+ docker service --name psight1 -p 8080:8080 --replicas 5 nigelpoulton\pluralsight-docker-ci
+ ```
+- five instancecs will be spun up. Their status will be 
+```
+ docker services ps psight1
+ ID                  NAME                IMAGE                                       NODE                      DESIRED STATE       CURRENT STATE            ERROR               PORTS
+fstoe1i0o747        psight1.1           nigelpoulton/pluralsight-docker-ci:latest   myLaptop   Running             Running 13 minutes ago                       
+bjb2chs9k86y        psight1.2           nigelpoulton/pluralsight-docker-ci:latest   myLaptop   Running             Running 13 minutes ago                       
+3qrj5ppfdgst        psight1.3           nigelpoulton/pluralsight-docker-ci:latest   myLaptop   Running             Running 13 minutes ago                       
+dmib30alpvwc        psight1.4           nigelpoulton/pluralsight-docker-ci:latest   myLaptop   Running             Running 13 minutes ago                       
+4r04dv0zv7ur        psight1.5           nigelpoulton/pluralsight-docker-ci:latest   myLaptop   Running             Running 13 minutes ago                 
+```
+- Note that the node name is all myLaptop indicating that the service has created 5 replicas in a single node and the only node in the swarm.
+- Note how the service does not care about the infra. It just spins up enough containers to meet desired state.
+- When we try out the service in the browser at port 8080 it will work.
+- Here is the most interesting thing. When running in a proper swarm, **regardless of the exact nodes in the swarm running the task/container, hitting the 8080 port on any of the nodes in the cluster will always return a proper response**
+- **routing-mesh** this is the magic that happens behind the scenes that makes the service a container aware load balancer
+- to view detailed information about a docker service key in `docker servie inspect --pretty psight1OrYourDockerServiceNamehere`
+
+### scaling docker services in other words, adding / removing tasks###
+- We can increase the number of tasks run by a service with a simple command
+- There are two versions of the command
+- This one is the preferred one `docker service update --replicas 10 psight1OrYourServiceNamehere`
+- The other way is using a command alias `docker service scale psight1OrYourServiceNamehere=10`
+- This command works both for scaling **up** or **down**
+-  :heavy_exclamation_mark: adding new nodes **may** not guarantee rebalancing of tasks/containers across to include the new node
+
+### removing a docker service ###
+- To stop all tasks and remove a service the command is `docker service rm psight1OrYourServiceNameHere`
+
+## creating an overlay network##
+- to create an overlay network (is it like a vlan?) type ` docker network create -d overlay ps-netOrYourNetworkNamehere`
+- to check the networks list type `docker network ls`
+
+## Rolling updates ##
+- Lets first inspect a docker service by keying in `docker service inspect psight1` you will see this
+```
+ID:		t6szoctp30sitbe0mr41e90db
+Name:		psight1
+Service Mode:	Replicated
+ Replicas:	6
+Placement:
+UpdateConfig:
+ Parallelism:	1
+ On failure:	pause
+ Monitoring Period: 5s
+ Max failure ratio: 0
+ Update order:      stop-first
+RollbackConfig:
+ Parallelism:	1
+ On failure:	pause
+ Monitoring Period: 5s
+ Max failure ratio: 0
+ Rollback order:    stop-first
+ContainerSpec:
+ Image:		nigelpoulton/tu-demo:v1@sha256:9ccc0c67e5c5eaae4bebeeed9b22e0e22f8a35624c1d5c80f2c9623cbcc9b59a
+Resources:
+Networks: ps-net 
+Endpoint Mode:	vip
+Ports:
+ PublishedPort = 80
+  Protocol = tcp
+  TargetPort = 80
+  PublishMode = ingress 
+```
+-If you notice the update related settings, parallelism is set to 1. This is the default. There are options to change it when starting a service .
+- using switches such as `--update-parallelism 2 --update-delay 10m ` etc.,
+### To start the update ###
+``` docker service update --image nigelpoulton/tu-demo:v2 --update-parallelism 2 --update-delay 10s psight1```
+
+## stacks and DAB - distributed application bundles ##
+- stacks -- defines an application comprising of multiple services
+- DAB -- stacks are deployed from distributed application bundles
+<This needs to be understood in detail. TBD>
