@@ -190,4 +190,22 @@ If you notice carefully, the commands with the join tokens are almost same excep
 #### Joining a manager or worker ####
 In the earlier section we noted that the `join-token` can be pulled up using a simple commmand. 
 Use the command verbatim , but with the following additions , in the new manager / worker being joined to the swarm
-` docker swarm join --token SWMTKN-1-021njpl9joa3msxr225qmrd4zvs6nwagrd0o11c4l07afoxe5k-alg961c3gwlb35skygjcs8dub 192.168.1.104:2377 --advertise-addr <to-be-joined manager/worker ipa to use:2377> --listen-addr <to-be-joined manager/worker ipa to use:2377>`
+``` docker swarm join --token SWMTKN-1-021njpl9joa3msxr225qmrd4zvs6nwagrd0o11c4l07afoxe5k-alg961c3gwlb35skygjcs8dub 192.168.1.104:2377 --advertise-addr <to-be-joined manager/worker ipa to use:2377> --listen-addr <to-be-joined manager/worker ipa to use:2377>```
+When this command is executed, a response as shown below pops up
+` this node joined a swarm as a manager'` or as a worker.
+
+#### Viewing the node status ####
+`docker node ls` is the command to view the node status it shows something like this
+```hs
+ID                            HOSTNAME                  STATUS              AVAILABILITY        MANAGER STATUS
+sdfh2387sdlkj2lkjp03575jls    < worker host name>       Ready               Active
+ncawby86hhlthjn9w9a93hzs4 *   venkatesh-Lenovo-G50-70   Ready               Active              Leader
+klsjdf0293jklflsjd0923llsd    < host name goes here>    Ready               Active              Reachable
+```
+- *note* the asterisk (\*) against the ID `ncawby86hhlthjn9w9a93hzs4 *` shows the node that the user is currently logged on to
+-  :heavy_exclamation_mark: The command will run only on managers & **not** workers
+- The worker node can be identified by the absence of a manager status.
+
+#### Can i change a worker to a manager- Yes ####
+Its possible to mistakingly use the wrong token. So to help smooth things, here is a command to convert a worker to a manager
+``` docker node promote <the ID that looks like a GUID>```
