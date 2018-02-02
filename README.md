@@ -1,3 +1,34 @@
+Table of Contents
+=================
+
+   * [getting-started-with-docker](#getting-started-with-docker)
+      * [Installing Docker in Ubuntu](#installing-docker-in-ubuntu)
+      * [Post installation setup a docker group and add the user to the group](#post-installation-setup-a-docker-group-and-add-the-user-to-the-group)
+      * [Verifying the installation](#verifying-the-installation)
+      * [Images](#images)
+         * [Download and installing images](#download-and-installing-images)
+         * [Deleting images](#deleting-images)
+      * [Containers](#containers)
+         * [Stopping and deleting containers](#stopping-and-deleting-containers)
+      * [Images repository](#images-repository)
+      * [Dockers and swarms](#dockers-and-swarms)
+         * [Terms and definitions](#terms-and-definitions)
+         * [Setting up a swarm](#setting-up-a-swarm)
+            * [To start a swarm####](#to-start-a-swarm)
+            * [To join a manager or worker to the swarm](#to-join-a-manager-or-worker-to-the-swarm)
+            * [Joining a manager or worker](#joining-a-manager-or-worker)
+            * [Viewing the node status](#viewing-the-node-status)
+            * [Can i change a worker to a manager- Yes](#can-i-change-a-worker-to-a-manager--yes)
+         * [Services](#services)
+            * [Creating a service](#creating-a-service)
+            * [Viewing the replica status](#viewing-the-replica-status)
+         * [scaling docker services in other words, adding / removing tasks###](#scaling-docker-services-in-other-words-adding--removing-tasks)
+         * [removing a docker service](#removing-a-docker-service)
+      * [creating an overlay network##](#creating-an-overlay-network)
+      * [Rolling updates](#rolling-updates)
+         * [To start the update](#to-start-the-update)
+      * [stacks and DAB - distributed application bundles](#stacks-and-dab---distributed-application-bundles)
+
 
 # getting-started-with-docker
 ## Installing Docker in Ubuntu
