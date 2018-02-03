@@ -1,7 +1,8 @@
-# Getting-started-with-docker. Based on a pluralsight course by Nigel Poulton
+# Getting-started-with-docker. Based on a pluralsight course by Nigel Poulton and on the Docker Book
 Table of Contents
 =================
-
+   * [Getting-started-with-docker. Based on a pluralsight course by Nigel Poulton and](#getting-started-with-docker-based-on-a-pluralsight-course-by-nigel-poulton)
+   * [Table of Contents](#table-of-contents)
    * [getting-started-with-docker](#getting-started-with-docker)
       * [Installing Docker in Ubuntu](#installing-docker-in-ubuntu)
       * [Post installation setup a docker group and add the user to the group](#post-installation-setup-a-docker-group-and-add-the-user-to-the-group)
@@ -11,6 +12,11 @@ Table of Contents
          * [Deleting images](#deleting-images)
       * [Containers](#containers)
          * [Stopping and deleting containers](#stopping-and-deleting-containers)
+         * [restarting failed containers](#restarting-failed-containers)
+         * [inspecting docker configuration](#inspecting-docker-configuration)
+         * [Docker logs](#docker-logs)
+         * [Inspecting processes running inside a container](#inspecting-processes-running-inside-a-container)
+         * [Adding another process to a running container](#adding-another-process-to-a-running-container)
       * [Images repository](#images-repository)
       * [Dockers and swarms](#dockers-and-swarms)
          * [Terms and definitions](#terms-and-definitions)
@@ -29,6 +35,7 @@ Table of Contents
       * [Rolling updates](#rolling-updates)
          * [To start the update](#to-start-the-update)
       * [stacks and DAB - distributed application bundles](#stacks-and-dab---distributed-application-bundles)
+
 
 
 # getting-started-with-docker
