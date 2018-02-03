@@ -139,7 +139,16 @@ WARNING: No swap limit support
   > Usage:	docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
   - for instance we could run ` docker run -it ubuntu /bin/bash` to run the bash command inside ubuntu container thats run in an interactive mode
     - when you run this container. the container will run only as long as the bash terminal runs. The moment you exit the bash, the container will stop.
-    **gotcha** if you want to attach to a running container in an interactive mode. use `docker attach <containerFunnName or guid>`
+    **gotcha** if you want to attach to a  container running in detached / daemon mode to an interactive terminal session. use `docker attach <containerFunnName or guid>`
+    - Here is another example `docker run -it ubuntu /bin/bash -c "ls -l"` will print the following output and terminate the container
+    ```
+    total 64
+    drwxr-xr-x   2 root root 4096 Jan 23 22:49 bin
+    drwxr-xr-x   2 root root 4096 Apr 12  2016 boot
+    drwxr-xr-x   5 root root  360 Feb  3 14:25 dev
+    ....
+
+    ```
 - To list all containers - ```docker ps -a ```
 - To list all containers' GUIDs - ``` docker ps -aq```
 - To start a container ```docker start <Container funny name or guid> ```
@@ -151,7 +160,28 @@ WARNING: No swap limit support
 - If a container has only one running process, the container will automatically stop when the solitary process stops.
 - To delete a container - ``` docker rm <container funny name or guid> ```
 - To delete all containers - ```docker rm $(docker ps -aq) ```
+### Docker logs
+- This helps understand whats happening in a container as it runs
+- use the command `docker logs -f <containerFunnyName or guid>` this is somewhat similar to the `tail -f ` command on a log file
+- or tail specific number of lines with this command `docker logs --tail 10 -f <containerFunnyNameOrGuid>` to specify a follow of the last 10 lines
+- additionally we can print timestamps to help debugging ` docker logs -ft <containerFunnyNameOrGuid>` to print
+  ```
+  2018-02-03T14:30:24.082610889Z total 64
+  2018-02-03T14:30:24.082676045Z drwxr-xr-x   2 root root 4096 Jan 23 22:49 bin
+  2018-02-03T14:30:24.082685440Z drwxr-xr-x   2 root root 4096 Apr 12  2016 boot
+  ...
+  ```
+- there are docker log drivers available to direct the logs to different channels.  logs can also be directed to the hosts' log channel using the `--log-driver="syslog" ` command. 
+- Alternatively , logging can be altogether disabled using the log-driver="none" switch
+### Inspecting processes running inside a container
+- for instance lets run a container by running `docker run -p 80:80 nigelpoulton/tu-demo:v1 --name elClassico`
+- now running `docker top elClassico` will yield
+  ```
+  UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD
+  root                30259               30241               0                   20:21               ?                   00:00:00            python app.py
 
+  ```
+- to get the resource utilization stats type `docker stats elClassico`  or the respective container name
 ## Images repository
 All docker images are hosted here at [Docker hub](https://hub.docker.com#
 
