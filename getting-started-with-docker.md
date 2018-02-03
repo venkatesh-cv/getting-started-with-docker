@@ -135,6 +135,11 @@ WARNING: No swap limit support
 - To run a container in an interactive mode (opposite of daemon mode) - ``` docker run -it image name ``` Not recommended. 
   - the ```-it``` switch makes it run interactively and assigns it to the default terminal.
   - To quit interactive mode without killing the container, use ``` ctrl + p + q```
+- docker run command has the following syntax
+  > Usage:	docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+  - for instance we could run ` docker run -it ubuntu /bin/bash` to run the bash command inside ubuntu container thats run in an interactive mode
+    - when you run this container. the container will run only as long as the bash terminal runs. The moment you exit the bash, the container will stop.
+    **gotcha** if you want to attach to a running container in an interactive mode. use `docker attach <containerFunnName or guid>`
 - To list all containers - ```docker ps -a ```
 - To list all containers' GUIDs - ``` docker ps -aq```
 - To start a container ```docker start <Container funny name or guid> ```
