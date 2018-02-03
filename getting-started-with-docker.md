@@ -149,17 +149,237 @@ WARNING: No swap limit support
     ....
 
     ```
-- To list all containers - ```docker ps -a ```
-- To list all containers' GUIDs - ``` docker ps -aq```
-- To start a container ```docker start <Container funny name or guid> ```
-- to start a container in interactive mode ``` docker start -i <container funny name or guid> ```
+- To list all containers - `docker ps -a `
+- To list n instance of running or stopped previous containers - ` docker ps -n 10`
+- To list all containers' GUIDs - ` docker ps -aq`
+- To start a container `docker start <Container funny name or guid> `
+- to start a container in interactive mode ` docker start -i <container funny name or guid> `
 
 ### Stopping and deleting containers
-- To Stop a running container - ```docker stop <container funny name or GUID>```
-- To stop all running containers - ``` docker stop $(docker ps -aq)``` 
+- To Stop a running container - `docker stop <container funny name or GUID>`
+- To stop all running containers - ` docker stop $(docker ps -aq)`
 - If a container has only one running process, the container will automatically stop when the solitary process stops.
-- To delete a container - ``` docker rm <container funny name or guid> ```
-- To delete all containers - ```docker rm $(docker ps -aq) ```
+- To delete a container - ` docker rm <container funny name or guid> `
+- To delete all containers - `docker rm $(docker ps -aq) `
+
+### restarting failed containers
+- containers can be configured to automatically restart in the event of a container crash.
+- By default, containers are configured ***not*** to restart in the event of a failure and possibly with a good reason.
+- Should one desire to configure an automatic restart, its advisable to limit it to a lower number.
+- restart configuration is a part of container spin up using the `docker run` command. its done as follows
+- `docker run --restart=on-failure:5 ..... ` followed by the other options. Here docker has been advised to restart the container in the event of a catastrophic failure. But no more than 5 times.
+
+### inspecting docker configuration
+- run `docker inspect <containerFunnyNameOrGuid>`
+- **note** it throws up an huge JSON.
+- to query the JSON selectively, we can use `-f ` switch that is a **Go template  driven switch**
+- this allows us to write commands such as `docker inspect -f {{.NetworkSettings.IPAddress}} elClassico` to bring up
+  > 172.17.0.2
+- Refer the [Go Template link](https://golang.org/pkg/text/template/) for more information leveraging teh Go Template model for formatted queries
+- here is another on `docker inspect -f "{{.Name}} {{.State.Running}}" elClassico` to bring up
+  > elClassico true
+- Here is a sample of a full battery of attributes that can be used as a guide to prepare the `-f` switch
+```
+{
+        "Id": "ca2bdbd443c326c66dec0d19ce3c8e093b24af6be631e3ac84e8decbf56dc42d",
+        "Created": "2018-02-03T17:25:58.511212109Z",
+        "Path": "python",
+        "Args": [
+            "app.py"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 7096,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2018-02-03T17:25:59.508061749Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+ "Image": "sha256:9b915a241e29dc2767980445e3109412b1905b6f1617aea7098e7ac1e5837ae2",
+        "ResolvConfPath": "/var/lib/docker/containers/ca2bdbd443c326c66dec0d19ce3c8e093b24af6be631e3ac84e8decbf56dc42d/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/ca2bdbd443c326c66dec0d19ce3c8e093b24af6be631e3ac84e8decbf56dc42d/hostname",
+        "HostsPath": "/var/lib/docker/containers/ca2bdbd443c326c66dec0d19ce3c8e093b24af6be631e3ac84e8decbf56dc42d/hosts",
+        "LogPath": "/var/lib/docker/containers/ca2bdbd443c326c66dec0d19ce3c8e093b24af6be631e3ac84e8decbf56dc42d/ca2bdbd443c326c66dec0d19ce3c8e093b24af6be631e3ac84e8decbf56dc42d-json.log",
+        "Name": "/relaxed_meninsky",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "docker-default",
+        "ExecIDs": null,
+ "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {
+                "80/tcp": [
+                    {
+                        "HostIp": "",
+                        "HostPort": "8080"
+                    }
+                ]
+            },
+            "RestartPolicy": {
+                "Name": "on-failure",
+                "MaximumRetryCount": 5
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "shareable",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0
+        },
+"GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/3e174bafdd3a1dfbeffb8ca1a7d71ffc2865a03363cbd1fd00ce5a3b73c009b9-init/diff:/var/lib/docker/overlay2/c42089f145b89e8f0fafadcf7b39109a9d029fc605e3cd9fc0d2a0e7afb90981/diff:/var/lib/docker/overlay2/06d18781ea4eb4e406340bd390dfdfdaf09ae55addecb5c118f2ae1cd3668624/diff:/var/lib/docker/overlay2/30b04eb80670879718566a63cc8b562bb9492cc68cd0ba2008a505352110001d/diff:/var/lib/docker/overlay2/c4546f7a4c43c4573c670a4a0c87efabbdd351187c96e1a133ebd2be9a61b9ce/diff:/var/lib/docker/overlay2/2133d743ac143b57a3afa599af868c81a1e0b692dfe84df8b87306e93e49d528/diff:/var/lib/docker/overlay2/164b90569cdf37a3ebca0ac2106ee0e61792f2573d68afab7e656967445a8350/diff:/var/lib/docker/overlay2/dee9e01abb5370a93244563e127ddd205f67d6ac0d83e0a8ac06c32e3e8b2e17/diff:/var/lib/docker/overlay2/bcf6372e441a2739aeeb314858fa01240224199d676f4158c64b00e5674890c7/diff:/var/lib/docker/overlay2/1a50ba6e3ac42f0b7b76fb5706ddf2c260c126fe465d272c7c37511f62eb092e/diff:/var/lib/docker/overlay2/387402ba698b8ad95477eb2a19c52e98232651b1012c435a27b5f70cd19ad672/diff:/var/lib/docker/overlay2/8f6461b8fef1818600239623d91e575c2ad299b6c13d036c723959fd05fa677f/diff:/var/lib/docker/overlay2/5a40bbd74ddea5041a0de66d035319579455b8715cb214a423feb725f3a2098d/diff:/var/lib/docker/overlay2/d301264c24e2b003498c58e68dba729cfd7f6de0bf2c4ca5056da8f33533bb81/diff:/var/lib/docker/overlay2/8cbc654afb425c290849a0a8137ef804cf67f869bff9d878390ceaabb8b02f4d/diff:/var/lib/docker/overlay2/fbdcf82f3ba45ba58cc31fa7d4072178a48071d290e2d302b7c43346b12508e4/diff:/var/lib/docker/overlay2/e3ce5818bcb328395fe2012279755230eb933d469e602f6517390ab2251eb536/diff:/var/lib/docker/overlay2/5236e61144d16a7b054576af0873f015b0e9223a1e07ca434f80c9e4241838a4/diff:/var/lib/docker/overlay2/238da80ec95ca82859670cde56f5eff534181d026c57efe9ddebdafacd79d176/diff",
+                "MergedDir": "/var/lib/docker/overlay2/3e174bafdd3a1dfbeffb8ca1a7d71ffc2865a03363cbd1fd00ce5a3b73c009b9/merged",
+                "UpperDir": "/var/lib/docker/overlay2/3e174bafdd3a1dfbeffb8ca1a7d71ffc2865a03363cbd1fd00ce5a3b73c009b9/diff",
+                "WorkDir": "/var/lib/docker/overlay2/3e174bafdd3a1dfbeffb8ca1a7d71ffc2865a03363cbd1fd00ce5a3b73c009b9/work"
+            },
+            "Name": "overlay2"
+        },
+ "Mounts": [],
+        "Config": {
+            "Hostname": "ca2bdbd443c3",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "80/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "LANG=C.UTF-8",
+                "PYTHON_VERSION=2.7.10",
+                "PYTHON_PIP_VERSION=7.1.2"
+            ],
+            "Cmd": [
+                "python",
+                "app.py"
+            ],
+            "Image": "nigelpoulton/tu-demo:v1",
+            "Volumes": null,
+            "WorkingDir": "/app",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {}
+        },
+ "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "86aa2cddcdefeb04f3a988d3817ce432c5663ffb9d52bf830c0ec8cd3d2c481a",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {
+                "80/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "8080"
+                    }
+                ]
+            },
+            "SandboxKey": "/var/run/docker/netns/86aa2cddcdef",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "5b618325777b46587878e8768b57a34deac6ea41730ca8295593938cf1d8fab5",
+            "Gateway": "172.17.0.1",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "172.17.0.2",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "MacAddress": "02:42:ac:11:00:02",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "f92df2ef25d1c842e2cc7b55632c642c0066967f16969bb57b88a6c2f4e4aff8",
+                    "EndpointID": "5b618325777b46587878e8768b57a34deac6ea41730ca8295593938cf1d8fab5",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:11:00:02",
+                    "DriverOpts": null
+                }
+            }
+        }
+    }
+]
+
+```
+
 ### Docker logs
 - This helps understand whats happening in a container as it runs
 - use the command `docker logs -f <containerFunnyName or guid>` this is somewhat similar to the `tail -f ` command on a log file
@@ -182,8 +402,15 @@ WARNING: No swap limit support
 
   ```
 - to get the resource utilization stats type `docker stats elClassico`  or the respective container name
+
+### Adding another process to a running container
+- additional processes can be added to a running container in an interactive mode ` -it` or in a detached mode as a background process within the container using the `-d` switch.
+- To do this use the command `docker exec -d <containerFunnyNameOrGuid> command arguments`
+- for example `docker exec -it elClassico /bin/bash`
+- this will allow you to login to an image and see whats going on inside of it with the help of a bash shell and maybe add more components to the container for say a PoC! or more!
+
 ## Images repository
-All docker images are hosted here at [Docker hub](https://hub.docker.com#
+All docker images are hosted here at [Docker hub](https://hub.docker.com)
 
 ## Dockers and swarms
 ### Terms and definitions
