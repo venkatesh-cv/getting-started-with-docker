@@ -78,3 +78,39 @@ Docker, in addition to providing a simple to use API to spin up, automate contai
     - proxy settings can also be enabled
 ## Docker life cycle
 - read [getting-started-with-docker](getting-started-with-docker.md)
+## Docker images
+- Docker image is a layered file system as shown in the image below
+![Docker's layered image fs](./docker-images/dockerImage.png)
+*image courtesy - The docker book and the [gitbook](https://washraf.gitbooks.io/the-docker-ecosystem/content/Chapter%201/Section%203/union_file_system.html) site*
+
+- Now remember, images are the templates and not their runtime counterparts (containers). 
+- At the base is the *bootfs* or the boot file system that behaves like the linux/unix file system comprising of the kernel and the containerization kernel essentials such as *cgroups* and *namespaces*
+- The next is the actual OS file system called the *rootfs*. This contains the OS related files. This is mounted as *read-only* in a docker container
+- Many more file systems are mounted on top of the *rootfs* leveraging a concept called as [Union File system](#Union-File-System). 
+
+- This allows for cherry picking the libraries and software required on the image. Such as say *vim* or *apache* or *nginx* and so on. The Union file system allows for layering the directories related to the desired libraries and software on top of the *rootfs* to create the final image. Though these are layered directories, Docker calls these as individual images.
+- An composed image is called a parent image and is used to spin up a container.
+- Finally, when a container is launched, Docker spins up a thin read-write layer on top of the image inside which our desired application(s) or services run.
+
+## Docker Containers
+- When images are spun up as containers, Docker adds a thin read-write layer on top of the file systems in the image.
+- This read-write layer is used to maintain the container state.
+- Also, when a change is made to a file , say a config file in the underlying image file system, a copy of it is made into the read-write layer where the changes are applied.
+- This ensures that the original image is retained in-tact and the delta changes are in the read-write layer.
+- The process of creating a copy into the read write layer on change is called copy-on-write.
+
+### Union File system
+Union File systems have been around since the 1980s in different forms. Many unpopular implementations later, *OverlayFS* implementation was added to the Linux Kernel
+- Union file system essentially allows directories to be layered on top of each other to make them appear as a single direcotry tree. 
+- This can be imagined to be similar to the layers concepts followed in OHP (slide projector) where a slide on top of another can be added to project their combined view as single picture. 
+- Even photoshop uses layers approach to apply different styles on images to envision the final state as a union of all layers. All the while without changing the actual original image. 
+
+##Docker Registry and Repository
+- [Docker Hub](http://hub.docker.com) is the public registry
+- The same can be availed for on premise enterprise use as [Docker Trusted Registry](https://docs.docker.com/datacenter/dtr/2.4/guides/)
+- Docker repository can be imagined to be similar to a git repo.
+- Images in a repo are identified by their name and tags.
+- Tags, similar to the public concept used all over the web are used to identify a particular image
+- Tags can be used to identify a specific version of image to be pulled from repo. For instace ` git pull ubuntu:14.04`
+    - Here the tag `14.04` has been identified after the image name `ubuntu` using a colon *(:)*
+- see [getting-started-with-docker](getting-started-with-docker.md) for docker image related commands

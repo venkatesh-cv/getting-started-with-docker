@@ -132,6 +132,19 @@ WARNING: No swap limit support
 - To delete a docker image - ```docker rmi <image name>```
 - To delete all docker images - ```docker rmi $(docker images -aq)```
 
+### seaching for images
+- The easiest is to visit [Docker hub](http://hub.docker.com) on the browser and check
+- Alternatively, `docker search <imageName>` can be used. For instance `docker search puppet` will bring up
+    ```
+    NAME                             DESCRIPTION                                     STARS               OFFICIAL            AUTOMATED
+    puppet/puppetserver              A Docker Image for running Puppet Server. Wi…   49                                      
+    devopsil/puppet                  Dockerfile for a container with puppet insta…   25                                      [OK]
+    macadmins/puppetmaster           Simple puppetmaster based on CentOS 6           25                                      [OK]
+
+    ... and many more             
+
+    ```
+
 ## Containers
 :large_orange_diamond: Container funny names are names automatically assigned to running containers when a name is not explicitly specified
 - To create a new container - ```docker run <image>```. This automatically pulls the image from the hub if its not available locally, and spawns a container off it and starts it. 
@@ -417,8 +430,111 @@ WARNING: No swap limit support
 - this will allow you to login to an image and see whats going on inside of it with the help of a bash shell and maybe add more components to the container for say a PoC! or more!
 
 ## Images repository
-All docker images are hosted here at [Docker hub](https://hub.docker.com)
+- All docker images are hosted here at [Docker hub](https://hub.docker.com)
+- To log into the docker hub from terminal use `docker login`
+- likewise use `docker logout` to end the session
 
+## Building your own Docker Image
+- The recommended way of building your own docker image is using a *dockerfile* & the `docker build` command
+- Generally building images involves using an existing base image such as an Ubuntu or a Fedora image to add layers on top
+- However, it is possible to build your own base image from the scratch. This link shows how  to create your own [base image](https://docs.docker.com/develop/develop-images/baseimages/)
+
+### using commit command to build your own image
+- though this is not the recommended way of building your own image, it is good to use this for learning purposes.
+- this approach helps customize a container to suit our need and commit it as a new image.
+- for instance, we can attach a bash session to a running container using 'docker exec -it , install vim and commit it as a new image. see below
+    ```
+    docker run -d -p 80:80 nigelpoulton/tu-demo:v1 --name elClassico
+    docker exec -it elClassico /bin/bash
+    in the newly opened bash session
+    apt-get update
+    apt-get install vim
+    vim
+    exit -- to log out of attached bash session in the container
+    docker commit -m "tu-demo with vim installed" -a "venkatesh" elClassico venkatesh/tu-demo-vim"
+    ```
+- now when we check images we will see ours
+    ```
+    docker images
+    REPOSITORY               TAG                 IMAGE ID            CREATED             SIZE
+    venkatesh/tu-demo-vim   latest              f389bd3c855d        10 minutes ago      251MB
+    nigelpoulton/tu-demo     v1                  9b915a241e29        21 months ago       212MB
+
+    ```
+- Once this is done, the newly commimted image can be used as any other image
+- to push this to your repo, use the git like command
+    ```
+    docker push venkatesh/tu-demo-vim
+    ```
+- finally refer this [link](https://docs.docker.com/engine/reference/commandline/commit/#description) for more switches for the commit command
+    ```
+    docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]
+    ```
+### Building your own images using Dockerfile
+- This approach involves building a script file that specifies the steps to customize a base image to our needs
+- to emulate the same example discussed earlier, the following steps are specified in the script
+    ```
+    FROM nigelpoulton/tu-demo
+    MAINTAINER venkatesh "someemail@gmail.com"
+    RUN apt-get update;apt-get install -y vim
+    ```
+- this pretty much does the same job as spooling up a tu-demo container, logging into it using an attached bash shell and running the apt-get commands to install the vim editor.
+- Dockerfile approach also is incremental in the sense that each step is an independent image that is in turn used recursively to build the next step. This way, it is easier to understand where a build breaks.
+- This approach of caching an image for each step is useful for debugging, but not a healthy one for reuse. So, in devops pipelines its always healthy to instruct docker not to cache anything using the `--no-cache` switch
+- To run the build process run the following command
+    ```
+    docker build -t="venkatesh/tu-demo-vim-build" --file build/DockerfileOrOtherFile ./build
+    Sending build context to Docker daemon  2.048kB
+    Step 1/3 : FROM nigelpoulton/tu-demo ---> 9b915a241e29
+    Step 2/3 : MAINTAINER venkatesh ---> Running in 0f75d0872881
+    Removing intermediate container 0f75d0872881 ---> f7d22e43862e
+    Step 3/3 : RUN apt-get update; apt-get install -y vim
+    ---> Running in 828fde4bf336
+    Get:1 http://security.debian.org jessie/updates InRelease [63.1 kB]
+    Ign http://httpredir.debian.org jessie InRelease
+
+    ```
+- the file can also be hosted out of github and the url used in the build command --file switch
+- to see how an image was built start with the `docker history <containerFunnyNameOrGuid>`
+- Here is another example where an ubuntu image is used to 
+    - build another one with Nginx installed 
+    - Create an index.html file 
+    - open port 80 on the container
+    - run nginx on startup in an imperative way 
+    - since nginx needs port 80, it becomes accessible on that.
+    ```
+    # version 0.0.1
+    FROM ubuntu:16.04
+    MAINTAINER venkatesh
+    RUN apt-get update; apt-get install -y nginx
+    RUN echo 'Hi Im in our container' > /var/www/html/index.html
+    EXPOSE 80
+    ENTRYPOINT ["usr/sbin/nginx", "-g", "daemon off;"]
+
+    ```
+    - if we spin up the container by say
+        ```
+        docker run -d --name elClassico -p 80:80 cvenkatesh/ubuntu-with-nginx
+        ```
+    - We will be able to access the *localhost* in the browser to see
+    > Hi Im in our container 
+#### Dockerfile CMD switch
+- this is used to specify the command that shall be run when a container is spun up from the image being built
+```
+CMD ["usr/sbin/nginx", "-g", "daemon off;"]
+```
+- but this can be overridden in the `docker run ` command when a command and args are present as the last argument
+- say if we run the container as `docker run -it newContainer /bin/bash` it will run the bash shell instead of the nginx startup command
+
+#### ENTRYPOINT switch
+- this is similar to the CMD switch only that this cannot be overridden from the docker run command line
+- any command and args given to the docker run command line will in turn be passed to the command specified in the ENTRYPOINT switch.
+- see example above.
+- if required entrypoint can be overridden explicitly with a `--entrypoint` flag
+
+#### WORKDIR switch
+- this is simple. This is used to configure working directory inside the image to run the Dockerfile commands
+- multiple WORKDIR can be specified. Simply use it like a `cd` command.
 ## Dockers and swarms
 ### Terms and definitions
 - **Swarm** - a cluster comprsing of docker engines is a swarm. Note - the word container is not being used here. just the engine
