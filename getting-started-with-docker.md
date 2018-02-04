@@ -535,6 +535,75 @@ CMD ["usr/sbin/nginx", "-g", "daemon off;"]
 #### WORKDIR switch
 - this is simple. This is used to configure working directory inside the image to run the Dockerfile commands
 - multiple WORKDIR can be specified. Simply use it like a `cd` command.
+
+#### Other switches
+##### ENV
+used to set an environment variable for executing a RUN command or such
+
+##### USER
+used to set the user / group context in which a subsequent command(s) has to be run.
+
+##### VOLUME
+This is used to map a network drive or folder to an image without adding / packaging it into the image. This helps map source code, resource folders, data folders etc.,
+- These exist outside of a container / image's life cycle
+- They are akin to any host folder that is mapped to another system
+```
+VOLUME ["/opt/project/src", "opt/project/build"]
+```
+##### ADD
+Thi is like *a copy into image* command. This is different from VOLUME in the aspect that all mapped directories and their content are copied into the image. 
+- as a bonus if the source is a tarball archive, it will be automatically extracted into the targt directory
+- useful for packing static content or such resources into the
+```
+ADD /opt/project/src/images /root/build/images
+ADD /opt/project/vendor/vendor.tar.gz /root/build/scripts/vendor
+```
+
+##### COPY
+This is similar to add only without the magic auto-extraction features
+
+##### LABEL
+helps add metadata to docker image.
+These are created as label=value format.
+```
+LABEL build="beta" role="web server"
+```
+ *IMPORTANT* its strongly recommended that multiple tags be added under one LABEL to avoid docker from creating a separate image for each tag (remember that Docker creates a separate image for each step)
+
+##### ARG
+This identifies the variables that can be passed as build-time arguments in the Docker build command. For example if we wish to change port numbers or such
+```
+ARG port=80
+```
+allows specifying the port number to use when building the image. If not specified the above syntax will default it to 80.
+- These arguments are passed using the --build-arg switch
+    ```
+    docker build --build-arg port=8080 -t myrepo/myimage ./buildDirectory
+    ```
+- There are a standard list of ARG variables available that do not require to be explicitly declared . 
+    - HTTP_PROXY
+    - HTTPS_PROXY
+    - FTP_PROXY
+    - NO_PROXY
+##### SHELL
+Helps run a command in a specific shell
+##### HEALTHCHECK
+Somewhat like an assert command for the container.Helps run commands that will verify whether the container started properly and is running properly
+- failing healthchecks will lead to containers being marked as unhealthy.
+- here is a simple command
+```
+HEALTHCHECK --interval=10s --timeout=1m --retries=5 CMD curl http://localhost || exit 1
+```
+to view the health of a container run
+```
+docker inspect --format '{{.State.Health.Status}}' containerName
+```
+##### ONBUILD
+This is a trigger for build event on an image. This is used when an image is used as a base image for another image. This might necessitate say a VOLUME to be ADDed into the image etc., This can be used for anything appropriate
+#### Automated Builds
+This allows syncing our Bitbucket or Github repos containing the Dockerfiles to Dockerhub in such a way that any updates to the repo will trigger an image to be built and published to the Dockerhub.
+This is useful in enterprise situations where CI/CD is in play
+
 ## Dockers and swarms
 ### Terms and definitions
 - **Swarm** - a cluster comprsing of docker engines is a swarm. Note - the word container is not being used here. just the engine
