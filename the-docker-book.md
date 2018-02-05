@@ -113,4 +113,4 @@ Union File systems have been around since the 1980s in different forms. Many unp
 - Tags, similar to the public concept used all over the web are used to identify a particular image
 - Tags can be used to identify a specific version of image to be pulled from repo. For instace ` git pull ubuntu:14.04`
     - Here the tag `14.04` has been identified after the image name `ubuntu` using a colon *(:)*
-- see [getting-started-with-docker](getting-started-with-docker.md) for docker image related commands
+- see [getting-started-with-docker](getting-started-with-docker.md) for docker image related commands. This is a test
