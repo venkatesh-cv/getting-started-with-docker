@@ -158,8 +158,9 @@ WARNING: No swap limit support
 - docker run command has the following syntax
   > Usage:	docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
   - for instance we could run ` docker run -it ubuntu /bin/bash` to run the bash command inside ubuntu container thats run in an interactive mode
-    - when you run this container. the container will run only as long as the bash terminal runs. The moment you exit the bash, the container will stop.
-    **gotcha** if you want to attach to a  container running in detached / daemon mode to an interactive terminal session. use `docker attach <containerFunnName or guid>`
+    - when you run this container. the container will run only as long as the bash terminal runs. The moment you exit the bash, the container will stop. 
+        - side note This is why the main running process in the container must run in interactive mode & not in daemon mode.For instance if the main process of a container is  a web server, it should run in interactive mode. If it runs in daemon mode inside the container, the container will stop immediately as soon as the bootstrapping executable forks the web server process to run as a daemon
+    - **gotcha** if you want to attach to a  container running in detached / daemon mode to an interactive terminal session. use `docker attach <containerFunnName or guid>`
     - Here is another example `docker run -it ubuntu /bin/bash -c "ls -l"` will print the following output and terminate the container
     ```
     total 64
@@ -517,7 +518,10 @@ WARNING: No swap limit support
         docker run -d --name elClassico -p 80:80 cvenkatesh/ubuntu-with-nginx
         ```
     - We will be able to access the *localhost* in the browser to see
-    > Hi Im in our container 
+        > Hi Im in our container 
+
+    - *side note* This is why the main running process in the container must run in interactive mode & not in daemon mode.For instance if the main process of a container is  a web server, it should run in interactive mode. If it runs in daemon mode inside the container, the container will stop immediately as soon as the bootstrapping executable forks the web server process to run as a daemon
+
 #### Dockerfile CMD switch
 - this is used to specify the command that shall be run when a container is spun up from the image being built
 ```
@@ -550,6 +554,14 @@ This is used to map a network drive or folder to an image without adding / packa
 ```
 VOLUME ["/opt/project/src", "opt/project/build"]
 ```
+###### -v SWITCH
+- its possible to map the volume at runtime when starting the container by using the switch `-v $PWD/path/to/folder:/container/target/path/to/folder ` . This causes the folder under the current working folder ($PWD) to be mapped to the container folder (`/container/target/path/to/folder`) at runtime.
+- Again, it is also important to note that volumes exist outside the container and bypass the union file system. 
+- a volume can be shared by two containers at runtime. 
+> ***Hint :*** this is useful for testing apps in development when we are not ready to bake the code into the image. 
+- **Read Only Volume** to map a volume as a read only volume use the ':ro` flag as shown below. ` -v $PWD/path/to/source/folder:/container/path/to/target/folder:ro`
+- **Read Write Volume** and to map a volume as a read-write  volume use the ':ro` flag as shown below. ` -v $PWD/path/to/source/folder:/container/path/to/target/folder:rw`
+
 ##### ADD
 Thi is like *a copy into image* command. This is different from VOLUME in the aspect that all mapped directories and their content are copied into the image. 
 - as a bonus if the source is a tarball archive, it will be automatically extracted into the targt directory
