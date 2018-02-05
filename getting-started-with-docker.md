@@ -604,6 +604,26 @@ This is a trigger for build event on an image. This is used when an image is use
 This allows syncing our Bitbucket or Github repos containing the Dockerfiles to Dockerhub in such a way that any updates to the repo will trigger an image to be built and published to the Dockerhub.
 This is useful in enterprise situations where CI/CD is in play
 
+## Running your own docker repository
+- Running your own registry is necessary when working behind corporate firewalls
+- Registry is available as a public image from docker. It can be run as follows
+```
+docker run -d -p 5000:5000 --name myRegistry registry
+```
+- this will pull the latest registry image from the [docker hub ](hub.docker.com) and run it as a container listening on port 5000
+### how to push images to a specific repository
+- to push an image to a local/private repository other than the standard docker hub, first it has to be tagged to the local/private repository
+```
+docker tag elClassico localhost:5000/venkatesh/ubuntuWithApache
+# NOW PUSH
+docker push localhost:5000/venkatesh/ubuntuWithApache
+```
+### how to pull images from a private/enterprise repository
+- to pull images from an enterprise / local / private reposisotry use the fully qualified image name with the repository URI as it was tagged.
+```
+docker run -it localhost:5000/venkatesh/ubuntuWithApache
+```
+
 ## Dockers and swarms
 ### Terms and definitions
 - **Swarm** - a cluster comprsing of docker engines is a swarm. Note - the word container is not being used here. just the engine
