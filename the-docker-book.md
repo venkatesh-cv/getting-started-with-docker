@@ -1,4 +1,23 @@
 # The docker book 
+Table of Contents
+=================
+
+   * [The docker book](#the-docker-book)
+      * [Introduction](#introduction)
+         * [Docker is a linux container](#docker-is-a-linux-container)
+            * [How does Namespacing help containers work?](#how-does-namespacing-help-containers-work)
+      * [Docker](#docker)
+         * [Docker features](#docker-features)
+            * [use cases](#use-cases)
+      * [Docker components](#docker-components)
+      * [Stacks and Swarms](#stacks-and-swarms)
+      * [Installing Docker](#installing-docker)
+         * [Configuring docker (see section 2.9.1 of the book)](#configuring-docker-see-section-291-of-the-book)
+      * [Docker life cycle](#docker-life-cycle)
+      * [Docker images](#docker-images)
+      * [Docker Containers](#docker-containers)
+         * [Union File system](#union-file-system)
+
 **By James Turnbull**
 - February 2018
 ## Introduction
