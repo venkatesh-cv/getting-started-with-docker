@@ -659,6 +659,50 @@ docker push localhost:5000/venkatesh/ubuntuWithApache
 docker run -it localhost:5000/venkatesh/ubuntuWithApache
 ```
 
+### Docker Networking - Getting containers to talk to each other
+- In real world conditions, we will be dealing with more than one container instances that host different systems or sub-systems. For instance, a container hosting a web server and another hosting a database server. In such situations it becomess important that the two servers can talk to each other.
+
+- It is also possible that these web and database containers run on different physical hosts. So, the networking solution must consider that containers that need to talk to each other may reside on any host on the internet.
+
+- Networking in Docker can be done in two ways.
+    - Docker internal networking
+        - This is a very limited function and is not generally preferred.
+    - Docker Networking (recommended)
+        - This is a more flexible version
+        - supports connecting containers across multiple hosts
+        - Behaves like phyical connection implying
+            - containers on these networks can be started or stopped without rejoining containers to the network or updating connections
+            - There is no need to create/start a container first to be able to connect to it
+            - There is no need to follow any order in spinning up the cotainers.
+            - The network enables internal name resolution and discovery
+
+#### Docker Internal Networking
+The below image gives a quick overview of the functioning of Docker Internal Networking
+![docker internal networking](./docker-images/dockerInternalNetworking.png)
+*image courtesy [blog.daocloud.io](http://blog.daocloud.io/wp-content/uploads/2015/01/Docker_Topology.jpg)*
+- Docker internal networking uses a combination of interfaces to setup a virtual network (vlan). From the picture above we can see that there are multiple interfaces.
+    
+    eth0 - this is the physical NIC on the host machine. This is the gateway to the external network <br/>
+    docker0 - this is an ethernet bridge installed during Docker installation. this serves as a bridge between the docker vlan and the host machine. This behaves like a virtual NIC.<br/>
+    veth* - these are peer network NICs created during container instantiation. This allows containers to be plugged into the Docker0 bridge. All communication from one server shall be routed to other servers vial the docker bridge (Docker0)
+
+
+## Development & testing docker based applications
+### For Developers
+- Docker's main utility in development & testing is that they provide a baseline infrastructure close to the production setup.
+- Being lightweight, its easy to run these containers on developer machines without needing extra-ordinary system resources.
+- So, how does one build a developer image off production & spin up a container?
+- To begin with, the reference image can be availed from our build team that is in charge of production infrastructure who are maintaining the enterprise Docker repo. That helps us get off the block fairly quickly.
+- However, we must now get our source code into the image. Before we do that lets not forget that as developers we are going to be changing source code fairly quickly. 
+- With that in mind, to make life easier, lets skip copying the code into the image and instead refer the source code via the VOLUME command or as a switch during startup. Whichever works for your case.
+    - so, the options being build a fresh image with a VOLUME mapped to the local source code folder
+    - or map the volume during container startup using the `--v hostpath:containerpath` switch.
+- This approach will allow developers to share a common developer image and get started off the block.
+### For QA
+- QA  can also follow the same option as developers. The only difference being that the containers will be spawned by the CI/CD pipeline that shall build the code, drop it in a predetermined location and spin up the QA containers with the same `--v ` switch or using QA images that have volumes pre-mapped using the `VOLUME ` command in their image build Dockerfile.
+
+
+
 ## Dockers and swarms
 ### Terms and definitions
 - **Swarm** - a cluster comprsing of docker engines is a swarm. Note - the word container is not being used here. just the engine
