@@ -1,7 +1,7 @@
 # Getting-started-with-docker. Based on a pluralsight course by Nigel Poulton and on the Docker Book
 Table of Contents
 =================
- * [Getting-started-with-docker. Based on a pluralsight course by Nigel Poulton and on the Docker Book](#getting-started-with-docker-based-on-a-pluralsight-course-by-nigel-poulton-and-on-the-docker-book)
+   * [Getting-started-with-docker. Based on a pluralsight course by Nigel Poulton and on the Docker Book](#getting-started-with-docker-based-on-a-pluralsight-course-by-nigel-poulton-and-on-the-docker-book)
    * [Table of Contents](#table-of-contents)
    * [getting-started-with-docker](#getting-started-with-docker)
       * [Installing Docker in Ubuntu](#installing-docker-in-ubuntu)
@@ -44,6 +44,14 @@ Table of Contents
       * [Docker Networks](#docker-networks)
          * [Docker Internal Networking](#docker-internal-networking)
          * [Docker Networking](#docker-networking)
+            * [Creating a network](#creating-a-network)
+               * [Simple Networks](#simple-networks)
+               * [Overlay Networks spanning multiple hosts (swarm mode)](#overlay-networks-spanning-multiple-hosts-swarm-mode)
+                  * [Overlay Network](#overlay-network)
+                  * [Ingress Network](#ingress-network)
+                  * [docker_gwbridge](#docker_gwbridge)
+            * [Docker network commands](#docker-network-commands)
+               * [Exercise](#exercise)
       * [Development &amp; testing docker based applications](#development--testing-docker-based-applications)
          * [For Developers](#for-developers)
          * [For QA](#for-qa)
