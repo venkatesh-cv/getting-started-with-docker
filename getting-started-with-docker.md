@@ -41,6 +41,12 @@ Table of Contents
       * [Running your own docker repository](#running-your-own-docker-repository)
          * [how to push images to a specific repository](#how-to-push-images-to-a-specific-repository)
          * [how to pull images from a private/enterprise repository](#how-to-pull-images-from-a-privateenterprise-repository)
+      * [Docker Networks](#docker-networks)
+         * [Docker Internal Networking](#docker-internal-networking)
+         * [Docker Networking](#docker-networking)
+      * [Development &amp; testing docker based applications](#development--testing-docker-based-applications)
+         * [For Developers](#for-developers)
+         * [For QA](#for-qa)
       * [Dockers and swarms](#dockers-and-swarms)
          * [Terms and definitions](#terms-and-definitions)
          * [Setting up a swarm](#setting-up-a-swarm)
@@ -58,7 +64,6 @@ Table of Contents
       * [Rolling updates](#rolling-updates)
          * [To start the update](#to-start-the-update)
       * [stacks and DAB - distributed application bundles](#stacks-and-dab---distributed-application-bundles)
-
 
 
 # getting-started-with-docker
@@ -198,6 +203,7 @@ WARNING: No swap limit support
 - To list all containers' GUIDs - ` docker ps -aq`
 - To start a container `docker start <Container funny name or guid> `
 - to start a container in interactive mode ` docker start -i <container funny name or guid> `
+- To start a container inside a network ` docker run -d --net=<mynetworkName> --name <containerName> <imagename>` (for information on docker networks see [Docker Networking](#docker-networking) )
 
 ### Stopping and deleting containers
 - To Stop a running container - `docker stop <container funny name or GUID>`
@@ -659,7 +665,7 @@ docker push localhost:5000/venkatesh/ubuntuWithApache
 docker run -it localhost:5000/venkatesh/ubuntuWithApache
 ```
 
-### Docker Networking - Getting containers to talk to each other
+## Docker Networks
 - In real world conditions, we will be dealing with more than one container instances that host different systems or sub-systems. For instance, a container hosting a web server and another hosting a database server. In such situations it becomess important that the two servers can talk to each other.
 
 - It is also possible that these web and database containers run on different physical hosts. So, the networking solution must consider that containers that need to talk to each other may reside on any host on the internet.
@@ -676,16 +682,60 @@ docker run -it localhost:5000/venkatesh/ubuntuWithApache
             - There is no need to follow any order in spinning up the cotainers.
             - The network enables internal name resolution and discovery
 
-#### Docker Internal Networking
+### Docker Internal Networking
 The below image gives a quick overview of the functioning of Docker Internal Networking
 ![docker internal networking](./docker-images/dockerInternalNetworking.png)
 *image courtesy [blog.daocloud.io](http://blog.daocloud.io/wp-content/uploads/2015/01/Docker_Topology.jpg)*
 - Docker internal networking uses a combination of interfaces to setup a virtual network (vlan). From the picture above we can see that there are multiple interfaces.
     
     eth0 - this is the physical NIC on the host machine. This is the gateway to the external network <br/>
-    docker0 - this is an ethernet bridge installed during Docker installation. this serves as a bridge between the docker vlan and the host machine. This behaves like a virtual NIC.<br/>
+    docker0 - this is an ethernet bridge installed during Docker installation. this serves as a bridge between the docker vlan and the host machine. This behaves like a virtual NIC. This behaves like a router and a dhcp server (similar to how a  wifi router handles wireless devices pluggin into it). This interface gets its own subnet and assigns ipa from this subnet to all containers.
+    <br/>
     veth* - these are peer network NICs created during container instantiation. This allows containers to be plugged into the Docker0 bridge. All communication from one server shall be routed to other servers vial the docker bridge (Docker0)
 
+    While this approach will technically work, this has some serious shortcomings
+    - IPA of containers will change on restart
+    - this requires container IPAs to be hardcoded into the configuration. Say, if we need to connect to a database container, the IPA has to be coded into the app-server container's configuration
+    - These two limitations make it a poor choice of production grade use.
+    - this is where *Docker networking* comes in
+
+### Docker Networking
+This is a supplementary layer on top of the Docker Internal Networking that gives additional control to the user to configure and manage networks. Additionally now containers can talk to each other across hosts<br/>
+- The most significant difference vis-a-vis Docker Internal Networking is that in this case the network has to be created first and then the containers launched inside it. 
+- Also the network support is pluggable to support different 
+    - topologies
+    - and networking frameworks from say VMWare or CiSCO
+    - drivers such as VXLAN, IPVLAN, MACVLAN 
+
+#### Creating a network
+##### Simple Networks
+`docker network create <networkName>` . This will create a new *bridged* network similar to that of the `Docker0` network we saw in the Docker Internal Network approach. 
+This network does not span multiple hosts. To do that read on.
+##### Overlay Networks spanning multiple hosts (swarm mode)
+Overlay networks are helpful when networks have to span multiple hosts. This is the standard production scenario. <br/>
+Docker networks in swarm mode need more elaborate network management features to manage traffic across participating nodes in the swarm. Following are some network types that help<br/>
+###### Overlay Network
+Overlay networks help participating nodes in a swarm talk to each other. To setup an overlay network an special *overlay* driver is used when creating a network.  See [Dockers and swarms](#dockers-and-swarms) section for notes on how overlay network driver has been used .<br/>
+`docker network create -d overlay <myNetworkName>`<br/>
+Overlay networks help lookup services by their host name instead of IPA. Say, if i spin up 10 replicas of a web-server container. I can lookup the web-server service using the host name web-server. <br/>
+Additionally, overlay network also helps look up the service using the network name as a domain suffix. for instance web-server.myOverlayNetwork
+###### Ingress Network
+This is a special network that also does traffic load balancing among all participating nodes in the network. Whenever a node receives a service request, it hands off the request to a special module called *IPVS*. This has a registry of all participating container services. It routest the request to one of them. 
+**NOTE** - While its possible to manually create an Ingress network, Ingress network is automatically created when a node is joined to a swarm. 
+
+###### docker_gwbridge
+This is a bridge network that connects all overlay networks including ingress network to a docker daemon's physical network. This is also created automatically when a swarm is created or joined.
+
+#### Docker network commands
+- List networks `docker network ls`
+- Inspect a network `docker network inspect <mynetworkName>`
+- Remove a network `docker network rm <mynetworkName>`
+- To create a container in a network `docker run -d --net=<mynetworkName> --name <containerName> <imagename>` 
+
+##### Exercise
+- Create a network and create two named containers in them
+- try to nslookup one container from the other using their container name. it should work.
+- Also looking up containerName.networkName should also work
 
 ## Development & testing docker based applications
 ### For Developers
@@ -843,6 +893,7 @@ dmib30alpvwc        psight1.4           nigelpoulton/pluralsight-docker-ci:lates
 ## creating an overlay network##
 - to create an overlay network (is it like a vlan?) type ` docker network create -d overlay ps-netOrYourNetworkNamehere`
 - to check the networks list type `docker network ls`
+- Read more at [Docker Networks](#docker-networks)
 
 ## Rolling updates ##
 - Lets first inspect a docker service by keying in `docker service inspect psight1` you will see this
