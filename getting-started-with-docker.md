@@ -714,19 +714,25 @@ This is a supplementary layer on top of the Docker Internal Networking that give
     - topologies
     - and networking frameworks from say VMWare or CiSCO
     - drivers such as VXLAN, IPVLAN, MACVLAN 
+- Docker Networking allows a container to lookup other container services using host name / container names. - This is possible because when a container is launched inside a network (as illustrated in point #1 above), the network is aware of all other containers running it . So, it maintains the local DNS up to date with the IPA and host name of all other containers in the network. Thus making nslookup possible and up to date. **Question** - is this DNS maintained in the docker0 layer or as hosts file in each container?
 
 #### Creating a network
 ##### Simple Networks
 `docker network create <networkName>` . This will create a new *bridged* network similar to that of the `Docker0` network we saw in the Docker Internal Network approach. 
 This network does not span multiple hosts. To do that read on.
+
 ##### Overlay Networks spanning multiple hosts (swarm mode)
 Overlay networks are helpful when networks have to span multiple hosts. This is the standard production scenario. <br/>
 Docker networks in swarm mode need more elaborate network management features to manage traffic across participating nodes in the swarm. Following are some network types that help<br/>
+
 ###### Overlay Network
 Overlay networks help participating nodes in a swarm talk to each other. To setup an overlay network an special *overlay* driver is used when creating a network.  See [Dockers and swarms](#dockers-and-swarms) section for notes on how overlay network driver has been used .<br/>
 `docker network create -d overlay <myNetworkName>`<br/>
+
 Overlay networks help lookup services by their host name instead of IPA. Say, if i spin up 10 replicas of a web-server container. I can lookup the web-server service using the host name web-server. <br/>
+
 Additionally, overlay network also helps look up the service using the network name as a domain suffix. for instance web-server.myOverlayNetwork
+
 ###### Ingress Network
 This is a special network that also does traffic load balancing among all participating nodes in the network. Whenever a node receives a service request, it hands off the request to a special module called *IPVS*. This has a registry of all participating container services. It routest the request to one of them. 
 **NOTE** - While its possible to manually create an Ingress network, Ingress network is automatically created when a node is joined to a swarm. 
@@ -740,17 +746,29 @@ This is a bridge network that connects all overlay networks including ingress ne
 - Remove a network `docker network rm <mynetworkName>`
 - To create a container in a network `docker run -d --net=<mynetworkName> --name <containerName> <imagename>` 
 
-##### Exercise
+##### Exercise - 1
 - Create a network and create two named containers in them
+- now launch bash in the container and install *dnsutils* and *iputils-ping*
 - try to nslookup one container from the other using their container name. it should work.
 - Also looking up containerName.networkName should also work
+
+##### Exercise - 2
+ - Run a container with a NodeJS app
+ - Run a container with MongoDb
+ - Make sure the application runs
+
+#### Joining Running Containers to Networks
+It is possible to join a running container to a network using the <br/> `docker network connect <networkname> <containerName>`
+
+Likewise, to disconnect one can use the following network disconnect command <br/> `docker network disconnect <networkName> <containerName>`
 
 ## Development & testing docker based applications
 ### For Developers
 - Docker's main utility in development & testing is that they provide a baseline infrastructure close to the production setup.
 - Being lightweight, its easy to run these containers on developer machines without needing extra-ordinary system resources.
 - So, how does one build a developer image off production & spin up a container?
-- To begin with, the reference image can be availed from our build team that is in charge of production infrastructure who are maintaining the enterprise Docker repo. That helps us get off the block fairly quickly.
+- To begin with, create separate networks for development testing etc., this will provide a network workspace on which you can setup your environment.
+- the reference image can be availed from our build team that is in charge of production infrastructure who are maintaining the enterprise Docker repo. That helps us get off the block fairly quickly.
 - However, we must now get our source code into the image. Before we do that lets not forget that as developers we are going to be changing source code fairly quickly. 
 - With that in mind, to make life easier, lets skip copying the code into the image and instead refer the source code via the VOLUME command or as a switch during startup. Whichever works for your case.
     - so, the options being build a fresh image with a VOLUME mapped to the local source code folder
@@ -758,6 +776,10 @@ This is a bridge network that connects all overlay networks including ingress ne
 - This approach will allow developers to share a common developer image and get started off the block.
 ### For QA
 - QA  can also follow the same option as developers. The only difference being that the containers will be spawned by the CI/CD pipeline that shall build the code, drop it in a predetermined location and spin up the QA containers with the same `--v ` switch or using QA images that have volumes pre-mapped using the `VOLUME ` command in their image build Dockerfile.
+
+
+## Using Docker in a Continuous Integration environment
+
 
 
 
