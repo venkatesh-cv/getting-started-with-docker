@@ -1,7 +1,7 @@
 # Getting-started-with-docker. Based on a pluralsight course by Nigel Poulton and on the Docker Book
 Table of Contents
 =================
-   * [Getting-started-with-docker. Based on a pluralsight course by Nigel Poulton and on the Docker Book](#getting-started-with-docker-based-on-a-pluralsight-course-by-nigel-poulton-and-on-the-docker-book)
+ * [Getting-started-with-docker. Based on a pluralsight course by Nigel Poulton and on the Docker Book](#getting-started-with-docker-based-on-a-pluralsight-course-by-nigel-poulton-and-on-the-docker-book)
    * [Table of Contents](#table-of-contents)
    * [getting-started-with-docker](#getting-started-with-docker)
       * [Installing Docker in Ubuntu](#installing-docker-in-ubuntu)
@@ -51,10 +51,14 @@ Table of Contents
                   * [Ingress Network](#ingress-network)
                   * [docker_gwbridge](#docker_gwbridge)
             * [Docker network commands](#docker-network-commands)
-               * [Exercise](#exercise)
+               * [Exercise - 1](#exercise---1)
+               * [Exercise - 2](#exercise---2)
+               * [EXERCISE NOTES](#exercise-notes)
+            * [Joining Running Containers to Networks](#joining-running-containers-to-networks)
       * [Development &amp; testing docker based applications](#development--testing-docker-based-applications)
          * [For Developers](#for-developers)
          * [For QA](#for-qa)
+      * [Using Docker in a Continuous Integration environment](#using-docker-in-a-continuous-integration-environment)
       * [Dockers and swarms](#dockers-and-swarms)
          * [Terms and definitions](#terms-and-definitions)
          * [Setting up a swarm](#setting-up-a-swarm)
@@ -72,11 +76,6 @@ Table of Contents
       * [Rolling updates](#rolling-updates)
          * [To start the update](#to-start-the-update)
       * [stacks and DAB - distributed application bundles](#stacks-and-dab---distributed-application-bundles)
-
-
-# getting-started-with-docker
-## Installing Docker in Ubuntu
-- Follow the instructions here [link to Installation guide @ Docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 
 ## Post installation setup a docker group and add the user to the group
 
