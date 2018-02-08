@@ -757,6 +757,51 @@ This is a bridge network that connects all overlay networks including ingress ne
  - Run a container with MongoDb
  - Make sure the application runs
 
+##### EXERCISE NOTES
+- **NodeJS Codebase** - The plan is to use the NodeJS learning project [Challenge3](https://github.com/venkatesh-cv/NodeJS) 
+- **Database** - Use Mongodb setup on top of an ubuntu image. The NodeJS app will create its own db 'test' and use it.
+- **Mongo Image Container Configuration** 
+    - start off with a basic ubuntu container
+    - install mongo in it
+    - expose port 27017
+    - no workdirectory, 
+    - no added data folders
+    - no CMD or ENTRYPOINT configs
+    - the plan is start mongo and map the db path as a part of the container startup command
+    - The docker file [buildUbuntuWithMongo](https://github.com/venkatesh-cv/docker-build/blob/master/ubuntuWithMongoDb/buildUbuntuWithMongo)
+- **Node Image Container Configuration**
+    - start off with a basic ubuntu container
+    - install node in it
+    - expose ports 80, 3000 and 8080
+        - Ports 3000 & 8080 are used by the NodejS app shown above
+    - No ADD to add source code
+    - No CMD or ENTRYPOINT configs
+    - The plan is to map source code as a volume, map the new volume as a workdir and start the app all on container startup
+    - The docker file [buildUbuntuWithNodeJs](https://github.com/venkatesh-cv/docker-build/blob/master/ubuntuWithNodeJs/buildUbuntuWithNodeJS)
+- NOTE- To debug, the images were started with bin/bash in interactive mode and tested.
+- **Creating an overlay network**
+    - Create an overlay network in which containers are to be created <br/> `docker network create overlay`
+- **Starting the containers**
+    - Mongo Server
+        - Start Mongo container in interactive mode inside the overlay network so that we can see whats happening with the db server.
+        - Map a volume at runtime. Map a local folder on the host as the data folder inside the container.
+        - db ports are to be accessed only from the node container & not the host. So no port mappings are required. The port 27017 is already accessible in the overlay network
+        - Start mongo in interactive mode from /usr/bin/ with dbpath mapped to the volume mapped in earlier step.
+        - NOTE - Mongo database server has to be started in interactive mode (not as a daemon) to ensure that the container does not exit. 
+        - [script to start the server ](https://github.com/venkatesh-cv/docker-build/blob/master/ubuntuWithMongoDb/buildUbuntuWithMongo)
+    - Node Server
+        - Start the container in interactive mode inside the overlay network so that we can see how the node server is functioning
+        - map the source code as volume at runtime directly from the local folder to a folder in the container.
+        - configure the working folder as the newly mapped source folder that the npm start command can be issued on that folder and the npm can access the package.json file in the codebase
+        - open the server ports(80 & 8080 and map them to 3000 & 8080 respectively) for access from host machine
+        - start node using npm start command
+        - [script to start the node server](https://github.com/venkatesh-cv/docker-build/blob/master/ubuntuWithNodeJs/startNodeContainer.sh)
+    - Testing
+        - fire the browser on the host machine and try accessing localhost/post it should work.
+        - if you observe the data folder mapped on the host machine, mongo db would have been written into it.
+    - Containers can be found here [Ubuntu-Nodejs](https://hub.docker.com/r/cvenkatesh/ubuntu-nodejs/) and [Ubuntu-Node-Mongo](https://hub.docker.com/r/cvenkatesh/ubuntu-node-mongo/)
+    - the startup scripts here [startNodeContainer.sh](https://github.com/venkatesh-cv/docker-build/blob/master/ubuntuWithNodeJs/startNodeContainer.sh) and [startMongoContainer.sh](https://github.com/venkatesh-cv/docker-build/blob/master/ubuntuWithMongoDb/startmongoContainer.sh)
+
 #### Joining Running Containers to Networks
 It is possible to join a running container to a network using the <br/> `docker network connect <networkname> <containerName>`
 
