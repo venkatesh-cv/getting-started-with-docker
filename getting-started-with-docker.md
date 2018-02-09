@@ -190,6 +190,7 @@ WARNING: No swap limit support
 - To run a container in an interactive mode (opposite of daemon mode) - ``` docker run -it image name ``` Not recommended. 
   - the ```-it``` switch makes it run interactively and assigns it to the default terminal.
   - To quit interactive mode without killing the container, use ``` ctrl + p + q```
+- To drop a container as soon as it stops use `docker run -rm....` swtich. This is useful when testing a newly created image. This removes the container as soon as it stops.
 - docker run command has the following syntax
   > Usage:	docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
   - for instance we could run ` docker run -it ubuntu /bin/bash` to run the bash command inside ubuntu container thats run in an interactive mode
@@ -218,6 +219,7 @@ WARNING: No swap limit support
 - If a container has only one running process, the container will automatically stop when the solitary process stops.
 - To delete a container - ` docker rm <container funny name or guid> `
 - To delete all containers - `docker rm $(docker ps -aq) `
+- To delete a container as soon as it stops run the container with a `-rm` switch. Such as `docker run -rm ...` This is useful when testing newly created images 
 
 ### restarting failed containers
 - containers can be configured to automatically restart in the event of a container crash.
@@ -598,6 +600,10 @@ VOLUME ["/opt/project/src", "opt/project/build"]
 - **Read Only Volume** to map a volume as a read only volume use the ':ro` flag as shown below. ` -v $PWD/path/to/source/folder:/container/path/to/target/folder:ro`
 - **Read Write Volume** and to map a volume as a read-write  volume use the ':ro` flag as shown below. ` -v $PWD/path/to/source/folder:/container/path/to/target/folder:rw`
 
+###### --volumes-from SWITCH
+- when setting up multiple containers with similar volumes it helps to map volumes en-masse across containers. To help with this , this switch can be used to map all the volumes in one container to another one as it starts. <br/> `docker run --volumes-from <anotherContainer>:ro|rw`<br/>
+Note how the the ro|rw flag can be used to mount the said volumes in read-write or read-only modes.
+
 ##### ADD
 Thi is like *a copy into image* command. This is different from VOLUME in the aspect that all mapped directories and their content are copied into the image. 
 - as a bonus if the source is a tarball archive, it will be automatically extracted into the targt directory
@@ -800,6 +806,15 @@ This is a bridge network that connects all overlay networks including ingress ne
         - if you observe the data folder mapped on the host machine, mongo db would have been written into it.
     - Containers can be found here [Ubuntu-Nodejs](https://hub.docker.com/r/cvenkatesh/ubuntu-nodejs/) and [Ubuntu-Node-Mongo](https://hub.docker.com/r/cvenkatesh/ubuntu-node-mongo/)
     - the startup scripts here [startNodeContainer.sh](https://github.com/venkatesh-cv/docker-build/blob/master/ubuntuWithNodeJs/startNodeContainer.sh) and [startMongoContainer.sh](https://github.com/venkatesh-cv/docker-build/blob/master/ubuntuWithMongoDb/startmongoContainer.sh)
+    - debugging
+    - The best way to debug a container is by starting the container with the `/bin/bash` command 
+    - To check connectivity it is recommended to install the following using `apt-get install -y <package>`
+        - dnsutils
+        - iptutils-ping
+        - the above packages will help do an `nslookup` or a `ping` to check connectivity and IPA resolution
+    - To check whether the ports on the containers are mapped to the right ports on the host machine, use the following command on the host machine<br/>
+    `sudo iptables -t nat -L -n`
+
 
 #### Joining Running Containers to Networks
 It is possible to join a running container to a network using the <br/> `docker network connect <networkname> <containerName>`
