@@ -658,6 +658,9 @@ This is a trigger for build event on an image. This is used when an image is use
 This allows syncing our Bitbucket or Github repos containing the Dockerfiles to Dockerhub in such a way that any updates to the repo will trigger an image to be built and published to the Dockerhub.
 This is useful in enterprise situations where CI/CD is in play
 
+##### -h SWITCH
+this is used to set the hostname of the container during startup. <br/>*exercise* - understand how this differs from setting --name switch
+
 ## Running your own docker repository
 - Running your own registry is necessary when working behind corporate firewalls
 - Registry is available as a public image from docker. It can be run as follows
@@ -676,6 +679,11 @@ docker push localhost:5000/venkatesh/ubuntuWithApache
 - to pull images from an enterprise / local / private reposisotry use the fully qualified image name with the repository URI as it was tagged.
 ```
 docker run -it localhost:5000/venkatesh/ubuntuWithApache
+```
+### Debugging Docker containers without SSH
+Production containers are usually light-weight and are not setup with bash shell to help with debugging. Instead use the `docker exec ` command as shown below <br/>
+```
+docker exec -it <containerName> /bin/bash
 ```
 
 ## Docker Networks
