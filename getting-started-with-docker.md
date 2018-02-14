@@ -3,8 +3,6 @@ Table of Contents
 =================
  * [Getting-started-with-docker. Based on a pluralsight course by Nigel Poulton and on the Docker Book](#getting-started-with-docker-based-on-a-pluralsight-course-by-nigel-poulton-and-on-the-docker-book)
    * [Table of Contents](#table-of-contents)
-   * [getting-started-with-docker](#getting-started-with-docker)
-      * [Installing Docker in Ubuntu](#installing-docker-in-ubuntu)
       * [Post installation setup a docker group and add the user to the group](#post-installation-setup-a-docker-group-and-add-the-user-to-the-group)
       * [Verifying the installation](#verifying-the-installation)
       * [Images](#images)
@@ -30,6 +28,7 @@ Table of Contents
                * [USER](#user)
                * [VOLUME](#volume)
                   * [-v SWITCH](#-v-switch)
+                  * [--volumes-from SWITCH](#--volumes-from-switch)
                * [ADD](#add)
                * [COPY](#copy)
                * [LABEL](#label)
@@ -38,9 +37,11 @@ Table of Contents
                * [HEALTHCHECK](#healthcheck)
                * [ONBUILD](#onbuild)
             * [Automated Builds](#automated-builds)
+               * [-h SWITCH](#-h-switch)
       * [Running your own docker repository](#running-your-own-docker-repository)
          * [how to push images to a specific repository](#how-to-push-images-to-a-specific-repository)
          * [how to pull images from a private/enterprise repository](#how-to-pull-images-from-a-privateenterprise-repository)
+         * [Debugging Docker containers without SSH](#debugging-docker-containers-without-ssh)
       * [Docker Networks](#docker-networks)
          * [Docker Internal Networking](#docker-internal-networking)
          * [Docker Networking](#docker-networking)
@@ -76,6 +77,7 @@ Table of Contents
       * [Rolling updates](#rolling-updates)
          * [To start the update](#to-start-the-update)
       * [stacks and DAB - distributed application bundles](#stacks-and-dab---distributed-application-bundles)
+ 
 
 ## Post installation setup a docker group and add the user to the group
 

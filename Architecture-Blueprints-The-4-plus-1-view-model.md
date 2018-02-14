@@ -1,3 +1,20 @@
+Table of Contents
+=================
+
+   * [Overview](#overview)
+   * [The need](#the-need)
+      * [Perry and Wolf's equation on architecture](#perry-and-wolfs-equation-on-architecture)
+   * [Architecture Model](#architecture-model)
+         * [Notations and Styles](#notations-and-styles)
+         * [Logical Architecture](#logical-architecture)
+            * [Diagrams used](#diagrams-used)
+         * [The process architecture](#the-process-architecture)
+            * [Diagrams used](#diagrams-used-1)
+      * [Development Architecture](#development-architecture)
+         * [Diagrams used](#diagrams-used-2)
+   * [Physical Architecture](#physical-architecture)
+   * [scenarios views.](#scenarios-views)
+
 # Overview
 This is a model for describing architecture of software systems. <br/>
 This uses multiple views to represent the architectural solution to a set of use-cases or scenarios<br/>
@@ -46,4 +63,48 @@ This view helps with identifying categories. See samples below
 
 ![Figure - 2 Sample](four_plus_one_images/Figure-3-a-Logical-blueprint-for-the-Télic-PABX.png)
 
+#### Diagrams used
+- Class Diagrams
+- State Chart 
+
 ### The process architecture
+The process archtiecture tries to provide a behavioral view to highlight specific non-functional parameters such as 
+ 1. Performance, 
+ 2. Availability
+ 3. Fault tolerance
+ 4. concurrency
+ 5. Recoverability etc.,
+The abstract class definitions given in the logical view are used here to depict their behavior when executing the scenarios and also depict process level (system level process) view of which is executed where and on what thread etc.,
+The process view can be represented at different levels to address different concerns. AT its highest level, this can be something like an interaction view between system processes spread across sytems in a distributed network. <br/>
+**Process** an independent executable that runs on a system. The executable can be built, tested, configured, started, stopped, scaled independent of other processes. Another important, but obious thing to note is that processes typically run one or more threads to execute/service one or more jobs at a time <br/>
+**Jobs / Tasks** Jobs or tasks can be compared to an individual service request that is executed by a process to fullfil it. Typically a job or a task can be construed to be something that runs on a thread to service a request or complete a work.
+    - Major tasks - are those which full service requests
+    - Minor tasks - those that are ancilliary like a cache request, database calls etc.,
+**System** a system comprises of a logical set of processes that implement a related set of features of a problem domain.
+
+#### Diagrams used
+- Interaction diagrams
+    - Communication / Collaboration diagrams
+    - Sequence Diagrams
+    - Component Diagrams
+
+## Development Architecture
+This is  a structural view that focuses on 
+- Software organization in development environment
+- These can be libraries or even sub-systems
+- ease of development
+- SCM
+- reuse
+- toolset
+- to communicate with dev teams on what they will work on
+- to estimate, plan 
+### Diagrams used
+- Component diagram
+- 
+
+# Physical Architecture
+This is a structural view that focuses on the deployment view and NFR characteristics
+
+# scenarios views.
+This is a behavioral model that depicts various business scenarios that form the basis of the architecture approach.<br/>
+![Scenario Diagram](four_plus_one_images/figure-11-scenario-diagram.png)
