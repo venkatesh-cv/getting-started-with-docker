@@ -1,3 +1,40 @@
+
+<!-- TOC -->
+
+- [Microservices Architecture - Aligning principles practices and culture](#microservices-architecture---aligning-principles-practices-and-culture)
+    - [The Microservices way](#the-microservices-way)
+        - [Birth of Microservices](#birth-of-microservices)
+        - [Characterestics of Microservices](#characterestics-of-microservices)
+        - [decentralization phobia and other larger questions](#decentralization-phobia-and-other-larger-questions)
+            - [truth is](#truth-is)
+        - [Soul of microservices](#soul-of-microservices)
+        - [Layers of Microservices](#layers-of-microservices)
+            - [Modularity](#modularity)
+                - [Monolith first](#monolith-first)
+                - [Gall's law](#galls-law)
+            - [Cohesiveness](#cohesiveness)
+            - [System elements](#system-elements)
+        - [Microservices maturity model](#microservices-maturity-model)
+    - [chapter 3 - designing microservice systems](#chapter-3---designing-microservice-systems)
+        - [Standardization and coordination](#standardization-and-coordination)
+        - [microservice design process](#microservice-design-process)
+            - [Define optimization goals](#define-optimization-goals)
+            - [Development principles](#development-principles)
+            - [Sketch](#sketch)
+            - [Implement, observe and adjust](#implement-observe-and-adjust)
+    - [Chapter 4 - Establishing a Foundation](#chapter-4---establishing-a-foundation)
+        - [Goals for Microservices](#goals-for-microservices)
+            - [Redcuce costs](#redcuce-costs)
+            - [Increase speed](#increase-speed)
+            - [Resilience](#resilience)
+            - [Visibility](#visibility)
+            - [the right balance](#the-right-balance)
+                - [Immutability](#immutability)
+                - [Separation of concerns](#separation-of-concerns)
+            - [Unix's rules and operating principles](#unixs-rules-and-operating-principles)
+            - [Reference principles](#reference-principles)
+
+<!-- /TOC -->
 # Microservices Architecture - Aligning principles practices and culture
 By Irakli Nadareishvili, Ronnie Mitra, Matt McLarty &  Mike Amundsen
 
@@ -129,3 +166,101 @@ So is it possible that microservices can be born out of only a monolith? is it p
 - On the other hand the risk of not having insight is trying to overengineer a system that is too complex to build and maintain for the given goals. For instance a system that is designed to handle a change that may nevr happen.
 - At the same time it is also important that the cost of making small changes is cheap and is often sufficient to course correct .
 - The emergent design should be larger than the changes made. 
+
+
+## Chapter 4 - Establishing a Foundation
+### Goals for Microservices
+
+- The overarching goal of any microservice is to balance speed and Safety at scale
+
+#### Redcuce costs
+
+- It is important to build-fast and fail-fast to keep costs low
+- avoid long drawn experiments
+- short-cycles help quickly assess business value.
+- Leverage virtual infrastructure and containers to optimize costs on hardware and tooling.
+
+#### Increase speed
+
+- continuing the same philosophy of build-fast and fail-fast it is important to keep release cycles super short.
+- leverage automation wherever possible such as CI/CD, Container orchestration etc.,
+- Some companies have automated to such a degree that they can hit production several times (even 100) a day.
+
+#### Resilience
+
+- This is the first element of Safety
+- systems that can withstand failures
+- In other words systems that dont crash
+- design for resiliency
+- This does not mean designing a bug-free system (a chimera) but rather systems that  can handle failures gracefully.
+- Continuous testing is a key aspect of ensuring resiliency. Automated tests at all levels (code, infrastrcture, process) is important to assess a systems response to failures or unexpected behavior. 
+- This is also called an *end-to-end* testing.
+- Consider a blue-green approach to deployment where a users are gradually onboarded to a new deployment with close monitoring.
+- Netflix uses chaos-monkey to test their resilience to failure.
+
+#### Visibility
+
+- Stakeholder visibility is very healthy. Work to improve it
+- code quality, coverage, other smells
+- tech. debt.
+- bugs
+- backlog
+- build metrics
+- Runtime behavior such as performance of APIs
+- error reports
+- alerting
+- utilization such as CPU, Memory, network
+- infrastrcture # of servers, scaling patterns
+
+#### the right balance
+
+- It is not always possible to prioritize just one of the above
+- it is important that a right balance is struck between optimizing costs, improving speed of development, resiliency and transparency.
+- The key to this balance is the goal definition that will help with prioritization
+Rule of parsimony
+Rule of parsimony
+
+- Principles define the guidelines for meeting the goals
+- They offer concrete guidance to achieving the stated goals through examples
+- It is important to note that the principles are not rules but more of guidelines or recipes
+Rule of parsimony
+Rule of parsimony
+Rule of parsimony
+Rule of parsimony
+Rule of parsimony
+Rule of parsimony such as 
+Rule of parsimony
+Rule of parsimony
+Rule of parsimony
+Rule of parsimonyian army tool Rule of parsimony
+Rule of parsimonyd system Rule of parsimonyiency in their Rule of parsimony
+Rule of parsimony alerting Rule of parsimony
+Rule of parsimony
+##### Immutability
+
+- Netflix focuses on building immutable systems
+- systems that are stateless and therefore horizontall scalable
+- The chaos-monkey tool regularly removes instances from prouction to test immutability and resiliency of their systems
+- additionally a red-black deployment is done to ensure immutability. This is another name to the blue-green approach mentioned earlier.
+
+##### Separation of concerns
+
+- in accordance with Conway's law a team is responsible for building, deploying, maintaining and evolving a set of micro-services.
+- They also will present a stable agreed contractual interface, SLAs to consumers for those services.
+
+#### Unix's rules and operating principles
+
+- Make each program do one thing well
+- build and test early
+- dont hesitate to rebuild clunk components
+- use tools
+
+#### Reference principles
+
+- do one thing well - this can vary for services. Depending on the bounded contexts.
+- build afresh - avoid repurposing old components to be microservices.
+- expect output to become input - always expect that the output of your system is an input to hitherto unknown system.
+- dont rely on interactive input - reduce / avoid dependency on human interactions to provide inputs.
+- try early - build-fast fail-fast
+- dont hesitate to throw it away - dont hesitate to retire old components that have outlived their use. Rebuild clunky components.
+- Toolmaking - Build tools, focus on productivity,speed and automation. Build your ownt tools as necessary.
