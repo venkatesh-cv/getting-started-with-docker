@@ -71,3 +71,61 @@ So is it possible that microservices can be born out of only a monolith? is it p
 - In other words, the sum of all parts.
 - Systems exhibit what is called an *Emergent Behavior* which states that the sum of all parts is larger than the sum itself.
 - The other nature of emergent behavior is that its difficul to predict change in behavior from an impact to a component.
+
+### Standardization and coordination
+- Standardization influences repeatability and therefore evolutionary improvements
+- this promotes Agility
+- this does not mean an organizational level of Standardization but more at a team level.
+- Standardization needs to be achieved for objectives/outputs, process and tools.
+- objective Standardization
+    - microservices have a standard objective - to build APIs
+    - APIs need to have a uniform / standard (ReST or such)
+    - Should emit events, subscribe to events
+- Standardization of skills
+    - a minimum standard skill level of a team member is paramount to success of the team.
+    - standardizing talent is an effective way of introducing more autonomy in the team.
+    - Such a team will be able to independently make decisions that align with overall objectives with little governance
+- Tool Standardization
+    - interface Standardization, process Standardization all have a consequence on tools
+    - the automatically limit the autonomy of tool selection
+    - this by itself can have unintended consequences on adaptability of the system.
+    - But this is necessary for defining the boundaries of automony of the team and also shape the overall emergent system
+
+### microservice design process
+- They key to a good design is the process itself
+- a good process allows a designer to shape the design over time to contiuously get closer to the best desired product.
+- The key is making the right assumptions, getting the right advice and keeping an open mind about impact of changes.
+- The design framework comprises of the following key steps
+    - Identify optimization goals
+    - Develop principles
+    - Sketch and iterate
+    - Implemnt, observe and adjust
+#### Define optimization goals
+- Set the goals that defines the success of the services
+- The goals may evolve over time but at any time, it should reflect what is just needed. remember YAGNI
+- This is the single most crucial activity that will impact all design choices.
+- The objective is to define the goals that define the optimal system behavior
+- The other important thing is to keep the list of goals themselves short. One should beware of the tendency to come up with a long list.
+- This does not mean foregoing all goals other than those in the shot list. It rather means that the design choices will be influenced/swung by those goals in the short list. For instance, if a reliable system is desired, it does not mean foregoing performance or security. But rather it means all key deicisions will prioritize reliability over performance.
+
+- Also as stated earlier, one must accept that goals will shift. So it is natural if in future performance takes the top spot. This does not mean that everything gets reversed. But rather it defines the focus needed and the decision tweaks/realignments needed to build on top of the now reliable system to make it more performant.
+
+#### Development principles
+- comprises of general policies, constraints and ideals that shall be univerally applied to the actors within the systm to guide decision making and behavior when they exercise their autonomy in decision-making.
+
+#### Sketch
+- Sketch the important parts of your system, review and iterate.
+- This helps assess decisions taken at a-point-in-time given a set of considerations and information.
+- This should cover
+    - The organizational structure
+    - solution architecture
+    - Service design (bounded contexts)
+    - processes and tools
+- also important is that the above sketches should follow the principles laid down.
+
+#### Implement, observe and adjust
+- The key to measurement is identifying the right set of KPIs that will provide insight into system behavior.
+- Withou this it is likely that decisions will be based on assumptions rather than facts and could lead to wrong decisions that can lead to mounting tech. debt.
+- On the other hand the risk of not having insight is trying to overengineer a system that is too complex to build and maintain for the given goals. For instance a system that is designed to handle a change that may nevr happen.
+- At the same time it is also important that the cost of making small changes is cheap and is often sufficient to course correct .
+- The emergent design should be larger than the changes made. 
